@@ -9,10 +9,10 @@ tmp_dir = "tmp"
   stop_singnal = "SIGINT" 
   stop_delay = 500
   args_bin = []
-  bin = "tmp\\main.exe"
-  cmd = "go build -gcflags='all=-N -l' -o ./tmp/main.exe ./app"
+  bin = "tmp/main"
+  cmd = "go build -gcflags='all=-N -l' -o ./tmp/main ./app"
   delay = 1000
-  entrypoint = ["tmp\\main.exe"]
+  entrypoint = ["tmp/main"]
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "app/vendor"]
   exclude_file = []
   exclude_regex = ["_test.go"]
