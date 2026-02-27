@@ -1,0 +1,15 @@
+# Unix/Linux/macOS通用Air配置
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  bin = "./tmp/main"
+  cmd = "go build -o ./tmp/main ./app"
+  delay = 1000
+  exclude_dir = ["tmp", "vendor"]
+  include_ext = ["go"]
+  log = "tmp/build-errors.log"
+
+[env]
+  AIR_MODE = "true"
+  CGO_ENABLED = "0"

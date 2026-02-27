@@ -7,6 +7,7 @@ import (
 	"go-learn/app/common/validation"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -40,19 +41,51 @@ func main() {
 		Addr:    ":9000",
 		Handler: r,
 	}
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+
+	// 检测是否在air环境中运行
+	isAirMode := os.Getenv("AIR_MODE") == "true"
+	
+	var ctx context.Context
+	var stop context.CancelFunc
+	
+	if isAirMode {
+		// Air模式下使用快速关闭
+		ctx, stop = context.WithCancel(context.Background())
+		go func() {
+			sigChan := make(chan os.Signal, 1)
+			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+			<-sigChan
+			stop()
+		}()
+	} else {
+		// 正常模式下使用标准优雅关闭
+		ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	}
 	defer stop()
+
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Listen Error: %s\n", err)
 		}
 	}()
+
 	<-ctx.Done()
-	color.Yellow("接收到退出信号，正在关闭服务...")
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		color.Red("服务强制关闭: ", err)
+	
+	if isAirMode {
+		color.Yellow("Air模式: 快速重启中...")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			color.Red("服务关闭错误: ", err)
+		}
+		color.Green("Air模式: 服务已准备重启")
+	} else {
+		color.Yellow("接收到退出信号，正在关闭服务...")
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			color.Red("服务强制关闭: ", err)
+		}
+		color.Yellow("服务已安全退出")
 	}
-	color.Yellow("服务已安全退出")
 }

@@ -2,37 +2,19 @@
 
 env_files = []
 root = "."
-testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  stop_singnal = "SIGINT" 
-  stop_delay = 500
-  args_bin = []
   bin = "tmp/main"
-  cmd = "go build -gcflags='all=-N -l' -o ./tmp/main ./app"
+  cmd = "go build -o tmp/main ./app"
   delay = 1000
-  entrypoint = ["tmp/main"]
-  exclude_dir = ["assets", "tmp", "vendor", "testdata", "app/vendor"]
-  exclude_file = []
-  exclude_regex = ["_test.go"]
-  exclude_unchanged = false
-  follow_symlink = false
-  full_bin = ""
-  ignore_dangerous_root_dir = false
-  include_dir = []
-  include_ext = ["go", "tpl", "tmpl", "html"]
-  include_file = []
-  kill_delay = "0s"
-  log = "build-errors.log"
-  poll = false
-  poll_interval = 0
-  post_cmd = []
-  pre_cmd = []
-  rerun = false
-  rerun_delay = 500
-  send_interrupt = false
-  stop_on_error = false
+  exclude_dir = ["tmp", "vendor"]
+  include_ext = ["go"]
+  log = "tmp/build-errors.log"
+
+[env]
+  AIR_MODE = "true"
+  CGO_ENABLED = "0"
 
 [color]
   app = ""
