@@ -6,7 +6,7 @@ import (
 
 	color "github.com/fatih/color"
 	"github.com/go-sql-driver/mysql"
-	gormMysql "gorm.io/driver/mysql"
+	gm "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -23,10 +23,21 @@ func Init() {
 		Loc:                  time.Local,
 		AllowNativePasswords: true,
 	}
-	dbIns, err := gorm.Open(gormMysql.Open(cfg.FormatDSN()), &gorm.Config{})
+	dbIns, err := gorm.Open(gm.Open(cfg.FormatDSN()), &gorm.Config{})
 	if err != nil {
-		panic("数据库链接失败: " + err.Error())
+		panic("GORM初始化失败: " + err.Error())
 	}
+	sqlDB, err := dbIns.DB()
+	if err != nil {
+		panic("获取SQL连接失败: " + err.Error())
+	}
+	if err := sqlDB.Ping(); err != nil {
+		panic("数据库连接验证失败: " + err.Error())
+	}
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(5 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 	db = dbIns
 	var version string
 	db.Raw("select version()").Scan(&version)

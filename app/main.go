@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 	validation.InitTrans()
@@ -44,10 +44,10 @@ func main() {
 
 	// 检测是否在air环境中运行
 	isAirMode := os.Getenv("AIR_MODE") == "true"
-	
+
 	var ctx context.Context
 	var stop context.CancelFunc
-	
+
 	if isAirMode {
 		// Air模式下使用快速关闭
 		ctx, stop = context.WithCancel(context.Background())
@@ -70,7 +70,7 @@ func main() {
 	}()
 
 	<-ctx.Done()
-	
+
 	if isAirMode {
 		color.Yellow("Air模式: 快速重启中...")
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
