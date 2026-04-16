@@ -19,3 +19,10 @@ func Register(c *gin.Context) {
 func List(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "user list"})
 }
+func Detail(c *gin.Context) {
+	userID := c.Param("id")
+	c.JSON(200, gin.H{"message": "user detail", "id": userID})
+}
+func Update(c *gin.Context) {
+	c.JSON(200, gin.H{"message": "user update"})
+}

@@ -13,6 +13,8 @@ import (
 	"syscall"
 	"time"
 
+	"go-learn/app/common/middleware"
+
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -43,6 +45,7 @@ func main() {
 	}))
 	v1 := r.Group("/v1")
 	{
+		v1.Use(middleware.AuthGuard())
 		router.InitRouter(v1)
 	}
 	srv := &http.Server{
@@ -50,25 +53,7 @@ func main() {
 		Handler: r,
 	}
 
-	// 检测是否在air环境中运行
-	isAirMode := os.Getenv("AIR_MODE") == "true"
-
-	var ctx context.Context
-	var stop context.CancelFunc
-
-	if isAirMode {
-		// Air模式下使用快速关闭
-		ctx, stop = context.WithCancel(context.Background())
-		go func() {
-			sigChan := make(chan os.Signal, 1)
-			signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-			<-sigChan
-			stop()
-		}()
-	} else {
-		// 正常模式下使用标准优雅关闭
-		ctx, stop = signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	}
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	go func() {
@@ -79,21 +64,20 @@ func main() {
 
 	<-ctx.Done()
 
-	if isAirMode {
-		color.Yellow("Air模式: 快速重启中...")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(shutdownCtx); err != nil {
-			color.Red("服务关闭错误: ", err)
+	// 优雅关闭：开发环境可设置 SHUTDOWN_TIMEOUT=1s 加快重启
+	timeout := 5 * time.Second
+	if t := os.Getenv("SHUTDOWN_TIMEOUT"); t != "" {
+		d, _ := time.ParseDuration(t)
+		if d > 0 {
+			timeout = d
 		}
-		color.Green("Air模式: 服务已准备重启")
-	} else {
-		color.Yellow("接收到退出信号，正在关闭服务...")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(shutdownCtx); err != nil {
-			color.Red("服务强制关闭: ", err)
-		}
-		color.Yellow("服务已安全退出")
 	}
+
+	color.Yellow("正在关闭服务...")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		color.Red("服务强制关闭: ", err)
+	}
+	color.Green("服务已退出了")
 }

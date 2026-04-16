@@ -8,38 +8,17 @@
 
 根据不同操作系统使用对应的启动脚本：
 
-**Windows:**
+**启动命令:**
 
 ```bash
-dev.bat
+air
 ```
 
-**macOS/Linux:**
+或指定配置文件（如有需要）：
 
 ```bash
-chmod +x dev.sh
-./dev.sh
+air -c .air.toml
 ```
-
-**或者手动指定配置文件:**
-
-Windows:
-
-```bash
-air -c .air.windows.toml
-```
-
-macOS/Linux:
-
-```bash
-air -c .air.unix.toml
-```
-
-### 配置文件说明
-
-- `.air.toml` - 默认跨平台配置（推荐）
-- `.air.windows.toml` - Windows专用配置
-- `.air.unix.toml` - Unix/Linux/macOS专用配置
 
 ### 手动构建
 
@@ -72,7 +51,7 @@ app/
 
 ## 环境要求
 
-- Go 1.21+
+- Go 1.25.0
 - Air (热重载工具)
 
 ## 安装Air
