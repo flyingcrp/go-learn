@@ -24,7 +24,7 @@ air -c .air.toml
 
 ```bash
 # 构建当前平台
-go build -o tmp/main ./app
+go build -o tmp/main ./cmd/server
 
 # 运行
 ./tmp/main  # Unix/Linux/macOS

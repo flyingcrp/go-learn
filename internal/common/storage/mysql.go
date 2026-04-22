@@ -23,6 +23,10 @@ func Init() {
 		Loc:                  time.Local,
 		AllowNativePasswords: true,
 	}
+	if cfg.Addr == "" || cfg.User == "" || cfg.Passwd == "" || cfg.DBName == "" {
+		panic("database config is invalid")
+
+	}
 	dbIns, err := gorm.Open(gm.Open(cfg.FormatDSN()), &gorm.Config{})
 	if err != nil {
 		panic("GORM初始化失败: " + err.Error())
