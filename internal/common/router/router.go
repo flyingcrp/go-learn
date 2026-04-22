@@ -1,7 +1,7 @@
 package router
 
 import (
-	"go-learn/app/user"
+	"go-learn/internal/user"
 
 	"github.com/gin-gonic/gin"
 )

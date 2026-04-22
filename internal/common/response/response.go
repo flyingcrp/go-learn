@@ -1,7 +1,7 @@
 package response
 
 import (
-	"go-learn/app/common/validation"
+	"go-learn/internal/common/validation"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

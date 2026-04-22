@@ -1,8 +1,8 @@
 package user
 
 import (
-	"go-learn/app/common/response"
-	"go-learn/app/common/validation"
+	"go-learn/internal/common/response"
+	"go-learn/internal/common/validation"
 
 	"github.com/gin-gonic/gin"
 )

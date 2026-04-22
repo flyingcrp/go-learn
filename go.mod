@@ -13,7 +13,7 @@ require (
 
 require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
-	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
+	go.mongodb.org/mongo-driver/v2 v2.5.1 // indirect
 )
 
 require (

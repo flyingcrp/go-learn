@@ -2,35 +2,23 @@ package main
 
 import (
 	"context"
-	"go-learn/app/common/router"
-	"go-learn/app/common/storage"
-	"go-learn/app/common/validation"
+	"go-learn/internal/common/router"
+	"go-learn/internal/common/storage"
+	"go-learn/internal/common/validation"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 	"time"
 
-	"go-learn/app/common/middleware"
+	"go-learn/internal/common/middleware"
 
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-	// 获取当前工作目录
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatal("Failed to get working directory")
-	}
-	// 构建 .env 文件的绝对路径
-	envPath := filepath.Join(wd, ".env")
-	if err := godotenv.Load(envPath); err != nil {
-		log.Fatal("Error loading .env file: ", err)
-	}
 	validation.InitTrans()
 	storage.Init()
 	defer storage.Close()

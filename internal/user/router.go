@@ -1,7 +1,7 @@
 package user
 
 import (
-	"go-learn/app/common/middleware"
+	"go-learn/internal/common/middleware"
 
 	"github.com/gin-gonic/gin"
 )
