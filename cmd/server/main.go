@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"go-learn/internal/common/router"
 	"go-learn/internal/common/storage"
 	"go-learn/internal/common/validation"
+	"go-learn/internal/user"
 	"log"
 	"net/http"
 	"os"
@@ -43,8 +43,12 @@ func main() {
 	}))
 	v1 := routers.Group("/v1")
 	{
-		router.InitRouter(v1, infra)
+		// 注入用户模块
+		userHandler := user.NewUserModule(infra)
+		user.RegisterRouter(v1, userHandler)
+		//注入其他模块
 	}
+
 	srv := &http.Server{
 		Addr:    ":9000",
 		Handler: routers,

@@ -1,16 +1,12 @@
 package user
 
 import (
-	"go-learn/internal/common/middleware"
-	"go-learn/internal/common/storage"
-
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRouter(r *gin.RouterGroup, infra *storage.Infra) {
-	user := r.Group("/user").Use(middleware.AuthGuard())
+func RegisterRouter(r *gin.RouterGroup, h *UserHandler) {
+	user := r.Group("/user")
 	{
-		user.POST("/register", Register)
+		user.POST("/register", h.Register)
 	}
-
 }
