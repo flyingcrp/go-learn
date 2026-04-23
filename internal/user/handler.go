@@ -2,27 +2,11 @@ package user
 
 import (
 	"go-learn/internal/common/response"
-	"go-learn/internal/common/validation"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Register(c *gin.Context) {
-	_, err := validation.BindJSON[CreateUserReq](c)
-	if err != nil {
-		response.FailWithValid(c, err)
-		return
-	}
-	c.String(200, "done")
-}
 
-func List(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "user list"})
-}
-func Detail(c *gin.Context) {
-	userID := c.Param("id")
-	c.JSON(200, gin.H{"message": "user detail", "id": userID})
-}
-func Update(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "user update"})
+	response.Ok(c, "用户创建成功", nil)
 }

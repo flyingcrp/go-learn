@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"os"
+	"fmt"
 	"time"
 
 	color "github.com/fatih/color"
@@ -10,48 +10,37 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
-func Init() {
-	cfg := mysql.Config{
-		User:                 os.Getenv("DB_USER"),
-		Passwd:               os.Getenv("DB_PASS"),
-		Addr:                 os.Getenv("DB_ADDR"),
-		Net:                  "tcp",
-		ParseTime:            true,
-		DBName:               os.Getenv("DB_NAME"),
-		Loc:                  time.Local,
-		AllowNativePasswords: true,
-	}
+func NewMySQL(cfg mysql.Config) (*gorm.DB, error) {
 	if cfg.Addr == "" || cfg.User == "" || cfg.Passwd == "" || cfg.DBName == "" {
-		panic("database config is invalid")
-
+		return nil, fmt.Errorf("database config is invalid")
 	}
 	dbIns, err := gorm.Open(gm.Open(cfg.FormatDSN()), &gorm.Config{})
 	if err != nil {
-		panic("GORM初始化失败: " + err.Error())
+		return nil, fmt.Errorf("GORM初始化失败: %v", err)
 	}
 	sqlDB, err := dbIns.DB()
 	if err != nil {
-		panic("获取SQL连接失败: " + err.Error())
+		return nil, fmt.Errorf("获取SQL连接失败: %v", err)
 	}
 	if err := sqlDB.Ping(); err != nil {
-		panic("数据库连接验证失败: " + err.Error())
+		return nil, fmt.Errorf("数据库连接验证失败: %v", err)
 	}
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(5 * time.Minute)
 	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
-	db = dbIns
+
 	var version string
-	db.Raw("select version()").Scan(&version)
-	color.Green("[MySQL] 链接成功! Version: %s", version)
+	dbIns.Raw("select version()").Scan(&version)
+	color.Yellow("[MySQL] 链接成功! DB: %s,version: %s", cfg.DBName, version)
+	return dbIns, nil
 }
-func Close() {
+
+func CloseMySQL(db *gorm.DB) error {
 	sqlDB, err := db.DB()
 	if err != nil {
-		return
+		return err
 	}
-	sqlDB.Close()
-	color.Green("[MySQL] 链接已关闭!")
+	color.Yellow("[MySQL] 已正常关闭")
+	return sqlDB.Close()
 }

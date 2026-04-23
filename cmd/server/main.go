@@ -12,17 +12,27 @@ import (
 	"syscall"
 	"time"
 
-	"go-learn/internal/common/middleware"
-
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
+	"github.com/go-sql-driver/mysql"
 )
 
 func main() {
 	validation.InitTrans()
-	// 初始化 mysql
-	storage.Init()
-	defer storage.Close()
+	infra, cleanup, err := storage.NewInfra(storage.Config{
+		MySQL: mysql.Config{User: os.Getenv("DB_USER"),
+			Passwd:               os.Getenv("DB_PASS"),
+			Addr:                 os.Getenv("DB_ADDR"),
+			Net:                  "tcp",
+			ParseTime:            true,
+			DBName:               os.Getenv("DB_NAME"),
+			Loc:                  time.Local,
+			AllowNativePasswords: true},
+	})
+	if err != nil {
+		log.Fatalf("Failed to initialize infrastructure: %v", err)
+	}
+	defer cleanup()
 	routers := gin.New()
 	routers.Use(gin.CustomRecovery(func(c *gin.Context, err any) {
 		c.AbortWithStatusJSON(500, gin.H{
@@ -33,8 +43,7 @@ func main() {
 	}))
 	v1 := routers.Group("/v1")
 	{
-		v1.Use(middleware.AuthGuard())
-		router.InitRouter(v1)
+		router.InitRouter(v1, infra)
 	}
 	srv := &http.Server{
 		Addr:    ":9000",
