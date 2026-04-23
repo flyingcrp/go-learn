@@ -10,25 +10,27 @@ import (
 // Ok 成功响应
 func Ok(c *gin.Context, message string, data any) {
 	c.JSON(http.StatusOK, gin.H{
-		"code":    0,
+		"code":    1,
 		"message": message,
 		"data":    data,
 	})
 }
+func OkWithData(c *gin.Context, data any) {
+	Ok(c, "操作成功", data)
+}
+func OkWithMessage(c *gin.Context, message string) {
+	Ok(c, message, nil)
+}
 
 // Fail 失败响应
-func Fail(c *gin.Context, code int, message string) {
-	c.JSON(code, gin.H{
-		"code":    code,
+func Fail(c *gin.Context, message string) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":    0,
 		"message": message,
 		"data":    nil,
 	})
 }
 
 func FailWithValid(c *gin.Context, err error) {
-	c.JSON(http.StatusBadRequest, gin.H{
-		"code":    400,
-		"message": validation.Translate(err),
-		"data":    nil,
-	})
+	c.String(http.StatusBadRequest, validation.Translate(err))
 }
