@@ -1,6 +1,8 @@
 package user
 
 import (
+	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -22,4 +24,18 @@ func (r *UserRepository) ExistsByEmail(email string) (bool, error) {
 }
 func (r *UserRepository) Create(user *User) error {
 	return r.db.Create(user).Error
+}
+func (r *UserRepository) Update(id string, newUser *User) error {
+	return r.db.Where("id = ?", id).Updates(newUser).Error
+}
+func (r *UserRepository) FindByID(id string) (*User, error) {
+	var user User
+	err := r.db.Where("id = ?", id).Omit("Token").Take(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
 }
