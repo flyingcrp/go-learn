@@ -4,6 +4,7 @@ import (
 	"context"
 	"go-learn/internal/common/storage"
 	"go-learn/internal/common/validation"
+	"go-learn/internal/department"
 	"go-learn/internal/user"
 	"log"
 	"net/http"
@@ -46,7 +47,10 @@ func main() {
 		// 注入用户模块
 		userHandler := user.NewUserModule(infra)
 		user.RegisterRouter(v1, userHandler)
-		//注入其他模块
+
+		//注入部门模块
+		depHandler := department.NewDepartmentModule(infra)
+		department.RegisterRouter(v1, depHandler)
 	}
 
 	srv := &http.Server{
