@@ -3,16 +3,18 @@ package user
 import (
 	"errors"
 	"fmt"
+	"go-learn/internal/department"
 
 	"github.com/google/uuid"
 )
 
 type UserService struct {
-	repo *UserRepository
+	repo     *UserRepository
+	depUtils *department.Utils
 }
 
-func NewUserService(repo *UserRepository) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(repo *UserRepository, depUtils *department.Utils) *UserService {
+	return &UserService{repo: repo, depUtils: depUtils}
 }
 func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
 	exist, err := s.repo.ExistsByEmail(p.Email)
@@ -26,13 +28,20 @@ func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
+	dep, err := s.depUtils.CheckID(p.DepartmentID)
+	if err != nil {
+		return nil, err
+	}
+	if dep == nil {
+		return nil, errors.New("无效的部门 ID")
+	}
 
 	user := &User{
 		ID:           uuid.String(),
 		Name:         p.Name,
 		Email:        p.Email,
-		DepartmentID: "p.DepartmentID",
-		RoleID:       "p.RoleID",
+		DepartmentID: p.DepartmentID,
+		RoleID:       p.RoleID,
 	}
 	err = s.repo.Create(user)
 	if err != nil {

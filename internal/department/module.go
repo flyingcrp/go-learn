@@ -2,8 +2,14 @@ package department
 
 import "go-learn/internal/common/storage"
 
-func NewDepartmentModule(infra *storage.Infra) *DepartmentHandler {
+type DepartmentModule struct {
+	Handler *DepartmentHandler
+	Utils   *Utils
+}
+
+func NewDepartmentModule(infra *storage.Infra) *DepartmentModule {
 	repo := NewDepartmentRepository(infra.MySQL)
 	srv := NewDepartmentService(repo)
-	return &DepartmentHandler{srv: srv}
+	utils := NewUtils(repo)
+	return &DepartmentModule{Handler: &DepartmentHandler{srv: srv}, Utils: utils}
 }

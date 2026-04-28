@@ -44,13 +44,14 @@ func main() {
 	}))
 	v1 := routers.Group("/v1")
 	{
-		// 注入用户模块
-		userHandler := user.NewUserModule(infra)
-		user.RegisterRouter(v1, userHandler)
 
 		//注入部门模块
-		depHandler := department.NewDepartmentModule(infra)
-		department.RegisterRouter(v1, depHandler)
+		dep := department.NewDepartmentModule(infra)
+		department.RegisterRouter(v1, dep.Handler)
+
+		// 注入用户模块
+		userHandler := user.NewUserModule(infra, dep.Utils)
+		user.RegisterRouter(v1, userHandler)
 	}
 
 	srv := &http.Server{
