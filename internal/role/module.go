@@ -1,6 +1,9 @@
 package role
 
-import "time"
+import (
+	"go-learn/internal/common/storage"
+	"time"
+)
 
 type Role struct {
 	ID          string     `gorm:"size:36;primaryKey;type:varchar(36)"`
@@ -13,4 +16,14 @@ type Role struct {
 
 func (Role) TableName() string {
 	return "role"
+}
+
+type RoleModule struct {
+	Handler *RoleHandler
+}
+
+func NewRoleModule(infra *storage.Infra) *RoleModule {
+	repo := NewRoleRepository(infra.MySQL)
+	srv := NewRoleService(repo)
+	return &RoleModule{Handler: NewRoleHandler(srv)}
 }

@@ -24,3 +24,9 @@
 - 不要重写无关文件。
 - 非必要不要新增依赖。
 - 如果改动会影响行为，除非任务要求，否则保持原有契约。
+
+## Git 提交规范 (Commits)
+
+- **标准**: 严格遵循 Conventional Commits (`type(scope): subject`)。
+- **常用 Type**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`。
+- **要求**: 简短、小写。AI 在执行 commit 操作前必须自动按此格式生成 Message。

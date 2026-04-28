@@ -5,6 +5,7 @@ import (
 	"go-learn/internal/common/storage"
 	"go-learn/internal/common/validation"
 	"go-learn/internal/department"
+	"go-learn/internal/role"
 	"go-learn/internal/user"
 	"log"
 	"net/http"
@@ -48,6 +49,9 @@ func main() {
 		//注入部门模块
 		dep := department.NewDepartmentModule(infra)
 		department.RegisterRouter(v1, dep.Handler)
+
+		roleModule := role.NewRoleModule(infra)
+		role.RegisterRouter(v1, roleModule.Handler)
 
 		// 注入用户模块
 		userHandler := user.NewUserModule(infra, dep.Utils)
