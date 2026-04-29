@@ -4,17 +4,19 @@ import (
 	"errors"
 	"fmt"
 	"go-learn/internal/department"
+	"go-learn/internal/role"
 
 	"github.com/google/uuid"
 )
 
 type UserService struct {
-	repo     *UserRepository
-	depUtils *department.Utils
+	repo      *UserRepository
+	depUtils  *department.Utils
+	roleUtils *role.Utils
 }
 
-func NewUserService(repo *UserRepository, depUtils *department.Utils) *UserService {
-	return &UserService{repo: repo, depUtils: depUtils}
+func NewUserService(repo *UserRepository, depUtils *department.Utils, roleUtils *role.Utils) *UserService {
+	return &UserService{repo: repo, depUtils: depUtils, roleUtils: roleUtils}
 }
 func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
 	exist, err := s.repo.ExistsByEmail(p.Email)
@@ -24,18 +26,35 @@ func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
 	if exist {
 		return nil, fmt.Errorf("邮箱已注册")
 	}
+
+	done := make(chan error, 2) // 缓冲 2，保证两个 goroutine 都能写入不阻塞
+	var dep *department.Department
+	var roleResult *role.Role
+
+	go func() {
+		var err error
+		dep, err = s.depUtils.CheckID(p.DepartmentID)
+		done <- err
+	}()
+	go func() {
+		var err error
+		roleResult, err = s.roleUtils.CheckID(p.RoleID)
+		done <- err
+	}()
+
+	for range 2 {
+		if err := <-done; err != nil {
+			return nil, fmt.Errorf("校验失败: %w", err)
+		}
+	}
+
+	if dep == nil || roleResult == nil {
+		return nil, errors.New("部门或角色不存在")
+	}
 	uuid, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
-	dep, err := s.depUtils.CheckID(p.DepartmentID)
-	if err != nil {
-		return nil, err
-	}
-	if dep == nil {
-		return nil, errors.New("无效的部门 ID")
-	}
-
 	user := &User{
 		ID:           uuid.String(),
 		Name:         p.Name,

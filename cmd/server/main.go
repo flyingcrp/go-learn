@@ -54,7 +54,7 @@ func main() {
 		role.RegisterRouter(v1, roleModule.Handler)
 
 		// 注入用户模块
-		userHandler := user.NewUserModule(infra, dep.Utils)
+		userHandler := user.NewUserModule(infra, dep.Utils, roleModule.Utils)
 		user.RegisterRouter(v1, userHandler)
 	}
 

@@ -20,10 +20,11 @@ func (Role) TableName() string {
 
 type RoleModule struct {
 	Handler *RoleHandler
+	Utils   *Utils
 }
 
 func NewRoleModule(infra *storage.Infra) *RoleModule {
 	repo := NewRoleRepository(infra.MySQL)
 	srv := NewRoleService(repo)
-	return &RoleModule{Handler: NewRoleHandler(srv)}
+	return &RoleModule{Handler: NewRoleHandler(srv), Utils: NewUtils(repo)}
 }
