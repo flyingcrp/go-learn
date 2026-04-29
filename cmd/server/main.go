@@ -2,34 +2,31 @@ package main
 
 import (
 	"context"
+	"go-learn/internal/common/middleware"
 	"go-learn/internal/common/storage"
 	"go-learn/internal/common/validation"
+	"go-learn/internal/config"
 	"go-learn/internal/department"
 	"go-learn/internal/role"
 	"go-learn/internal/user"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
-	"github.com/go-sql-driver/mysql"
 )
 
 func main() {
 	validation.InitTrans()
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
 	infra, cleanup, err := storage.NewInfra(storage.Config{
-		MySQL: mysql.Config{User: os.Getenv("DB_USER"),
-			Passwd:               os.Getenv("DB_PASS"),
-			Addr:                 os.Getenv("DB_ADDR"),
-			Net:                  "tcp",
-			ParseTime:            true,
-			DBName:               os.Getenv("DB_NAME"),
-			Loc:                  time.Local,
-			AllowNativePasswords: true},
+		MySQL: cfg.MySQL,
 	})
 	if err != nil {
 		log.Fatalf("Failed to initialize infrastructure: %v", err)
@@ -46,20 +43,21 @@ func main() {
 	v1 := routers.Group("/v1")
 	{
 
+		authGuard := middleware.AuthGuard(cfg.JWTSecret)
 		//注入部门模块
 		dep := department.NewDepartmentModule(infra)
-		department.RegisterRouter(v1, dep.Handler)
+		department.RegisterRouter(v1, dep.Handler, authGuard)
 
 		roleModule := role.NewRoleModule(infra)
-		role.RegisterRouter(v1, roleModule.Handler)
+		role.RegisterRouter(v1, roleModule.Handler, authGuard)
 
 		// 注入用户模块
-		userHandler := user.NewUserModule(infra, dep.Utils, roleModule.Utils)
-		user.RegisterRouter(v1, userHandler)
+		userHandler := user.NewUserModule(infra, dep.Utils, roleModule.Utils, cfg.JWTSecret)
+		user.RegisterRouter(v1, userHandler, authGuard)
 	}
 
 	srv := &http.Server{
-		Addr:    ":9000",
+		Addr:    cfg.Port,
 		Handler: routers,
 	}
 
@@ -74,11 +72,8 @@ func main() {
 	<-ctx.Done()
 	// 优雅关闭：开发环境可设置 SHUTDOWN_TIMEOUT=1s 加快重启
 	timeout := 600 * time.Millisecond
-	if t := os.Getenv("SHUTDOWN_TIMEOUT"); t != "" {
-		d, _ := time.ParseDuration(t)
-		if d > 0 {
-			timeout = d
-		}
+	if cfg.ShutdownTimeout != 0 {
+		timeout = cfg.ShutdownTimeout
 	}
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)

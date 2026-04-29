@@ -30,8 +30,10 @@ func (h *DepartmentHandler) Create(c *gin.Context) {
 }
 
 func (h *DepartmentHandler) Detail(c *gin.Context) {
+	// 从 context 中取出用户信息
 	id := c.Param("id")
 	ctx := c.Request.Context()
+
 	data, err := h.srv.Detail(ctx, id)
 	if err != nil {
 		response.Fail(c, err.Error())

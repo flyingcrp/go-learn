@@ -7,6 +7,7 @@ import (
 	"go-learn/internal/department"
 	"go-learn/internal/role"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
@@ -14,10 +15,11 @@ type UserService struct {
 	repo      *UserRepository
 	depUtils  *department.Utils
 	roleUtils *role.Utils
+	jwtSecret string
 }
 
-func NewUserService(repo *UserRepository, depUtils *department.Utils, roleUtils *role.Utils) *UserService {
-	return &UserService{repo: repo, depUtils: depUtils, roleUtils: roleUtils}
+func NewUserService(repo *UserRepository, depUtils *department.Utils, roleUtils *role.Utils, jwtSecret string) *UserService {
+	return &UserService{repo: repo, depUtils: depUtils, roleUtils: roleUtils, jwtSecret: jwtSecret}
 }
 func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, error) {
 	exist, err := s.repo.ExistsByEmail(ctx, p.Email)
@@ -94,4 +96,39 @@ func (s *UserService) Update(ctx context.Context, id string, p *UserUpdateReq) (
 		return nil, err
 	}
 	return user, nil
+}
+
+func (s *UserService) FindByID(ctx context.Context, id string) (*User, error) {
+	user, err := s.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, nil
+	}
+	return user, nil
+}
+func (s *UserService) Login(ctx context.Context, param *UserLoginReq) (*User, error) {
+	user, err := s.repo.Login(ctx, param.Name, param.Email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("用户不存在")
+	}
+	return user, nil
+}
+func (s *UserService) GenerateJWT(user *User) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": user.ID,
+		"name":    user.Name,
+		"email":   user.Email,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	secretKey := []byte(s.jwtSecret)
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }

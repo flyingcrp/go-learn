@@ -55,3 +55,40 @@ func (u *UserHandler) Update(c *gin.Context) {
 		Email: updatedUser.Email,
 	})
 }
+
+func (u *UserHandler) Detail(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		response.Fail(c, "id is required")
+		return
+	}
+	user, err := u.srv.FindByID(c.Request.Context(), id)
+	if err != nil {
+		response.Fail(c, err.Error())
+		return
+	}
+	if user == nil {
+		response.OkWithData(c, nil)
+		return
+	}
+	response.OkWithData(c, toUserDetailResp(user))
+}
+
+func (u *UserHandler) Login(c *gin.Context) {
+	params, err := validation.BindJSON[UserLoginReq](c)
+	if err != nil {
+		response.FailWithValid(c, err)
+		return
+	}
+	user, err := u.srv.Login(c.Request.Context(), params)
+	if err != nil {
+		response.Fail(c, err.Error())
+		return
+	}
+	token, err := u.srv.GenerateJWT(user)
+	if err != nil {
+		response.Fail(c, err.Error())
+		return
+	}
+	response.OkWithData(c, toLoginResp(user, token))
+}

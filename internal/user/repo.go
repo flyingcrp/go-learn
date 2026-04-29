@@ -40,3 +40,15 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*User, error)
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) Login(ctx context.Context, name, email string) (*User, error) {
+	var user User
+	err := r.db.WithContext(ctx).Where("name = ? AND email = ?", name, email).Take(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
+}
