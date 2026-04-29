@@ -9,6 +9,7 @@ import (
 
 // Ok 成功响应
 func Ok(c *gin.Context, message string, data any) {
+
 	c.JSON(http.StatusOK, gin.H{
 		"code":    1,
 		"message": message,

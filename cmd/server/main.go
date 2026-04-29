@@ -40,7 +40,7 @@ func main() {
 			"data":    nil,
 		})
 	}))
-	v1 := routers.Group("/v1")
+	v1 := routers.Group("/v1", middleware.TraceGuard())
 	{
 
 		authGuard := middleware.AuthGuard(cfg.JWTSecret)
