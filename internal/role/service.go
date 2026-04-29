@@ -1,6 +1,7 @@
 package role
 
 import (
+	"context"
 	"errors"
 
 	"github.com/google/uuid"
@@ -14,8 +15,8 @@ func NewRoleService(repo *RoleRepository) *RoleService {
 	return &RoleService{repo: repo}
 }
 
-func (srv *RoleService) Create(params *RoleCreateRequest) (*Role, error) {
-	exist, err := srv.repo.ExistsByName(params.Name)
+func (srv *RoleService) Create(ctx context.Context, params *RoleCreateRequest) (*Role, error) {
+	exist, err := srv.repo.ExistsByName(ctx, params.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +24,7 @@ func (srv *RoleService) Create(params *RoleCreateRequest) (*Role, error) {
 		return nil, errors.New("角色名称已存在")
 	}
 
-	exist, err = srv.repo.ExistsByCode(params.Code)
+	exist, err = srv.repo.ExistsByCode(ctx, params.Code)
 	if err != nil {
 		return nil, err
 	}
@@ -42,12 +43,12 @@ func (srv *RoleService) Create(params *RoleCreateRequest) (*Role, error) {
 		Code:        params.Code,
 		Description: params.Description,
 	}
-	if err := srv.repo.Create(role); err != nil {
+	if err := srv.repo.Create(ctx, role); err != nil {
 		return nil, err
 	}
 	return role, nil
 }
 
-func (srv *RoleService) Detail(id string) (*Role, error) {
-	return srv.repo.FindByID(id)
+func (srv *RoleService) Detail(ctx context.Context, id string) (*Role, error) {
+	return srv.repo.FindByID(ctx, id)
 }

@@ -21,7 +21,7 @@ func (h *RoleHandler) Create(c *gin.Context) {
 		response.FailWithValid(c, err)
 		return
 	}
-	data, err := h.srv.Create(params)
+	data, err := h.srv.Create(c.Request.Context(), params)
 	if err != nil {
 		response.Fail(c, err.Error())
 		return
@@ -31,7 +31,7 @@ func (h *RoleHandler) Create(c *gin.Context) {
 
 func (h *RoleHandler) Detail(c *gin.Context) {
 	id := c.Param("id")
-	data, err := h.srv.Detail(id)
+	data, err := h.srv.Detail(c.Request.Context(), id)
 	if err != nil {
 		response.Fail(c, err.Error())
 		return

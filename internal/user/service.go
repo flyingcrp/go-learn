@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"go-learn/internal/department"
@@ -18,8 +19,8 @@ type UserService struct {
 func NewUserService(repo *UserRepository, depUtils *department.Utils, roleUtils *role.Utils) *UserService {
 	return &UserService{repo: repo, depUtils: depUtils, roleUtils: roleUtils}
 }
-func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
-	exist, err := s.repo.ExistsByEmail(p.Email)
+func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, error) {
+	exist, err := s.repo.ExistsByEmail(ctx, p.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -33,12 +34,12 @@ func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
 
 	go func() {
 		var err error
-		dep, err = s.depUtils.CheckID(p.DepartmentID)
+		dep, err = s.depUtils.CheckID(ctx, p.DepartmentID)
 		done <- err
 	}()
 	go func() {
 		var err error
-		roleResult, err = s.roleUtils.CheckID(p.RoleID)
+		roleResult, err = s.roleUtils.CheckID(ctx, p.RoleID)
 		done <- err
 	}()
 
@@ -62,15 +63,15 @@ func (s *UserService) Register(p *UserRegisterReq) (*User, error) {
 		DepartmentID: p.DepartmentID,
 		RoleID:       p.RoleID,
 	}
-	err = s.repo.Create(user)
+	err = s.repo.Create(ctx, user)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (s *UserService) Update(id string, p *UserUpdateReq) (*User, error) {
-	user, err := s.repo.FindByID(id)
+func (s *UserService) Update(ctx context.Context, id string, p *UserUpdateReq) (*User, error) {
+	user, err := s.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (s *UserService) Update(id string, p *UserUpdateReq) (*User, error) {
 		return nil, errors.New("用户不存在")
 	}
 	if p.Email != user.Email {
-		exist, err := s.repo.ExistsByEmail(p.Email)
+		exist, err := s.repo.ExistsByEmail(ctx, p.Email)
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +89,7 @@ func (s *UserService) Update(id string, p *UserUpdateReq) (*User, error) {
 	}
 	user.Email = p.Email
 	user.Name = p.Name
-	err = s.repo.Update(id, user)
+	err = s.repo.Update(ctx, id, user)
 	if err != nil {
 		return nil, err
 	}

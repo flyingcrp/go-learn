@@ -20,7 +20,8 @@ func (h *DepartmentHandler) Create(c *gin.Context) {
 		response.FailWithValid(c, err)
 		return
 	}
-	data, err := h.srv.Create(params)
+	ctx := c.Request.Context()
+	data, err := h.srv.Create(ctx, params)
 	if err != nil {
 		response.Fail(c, err.Error())
 		return
@@ -30,7 +31,8 @@ func (h *DepartmentHandler) Create(c *gin.Context) {
 
 func (h *DepartmentHandler) Detail(c *gin.Context) {
 	id := c.Param("id")
-	data, err := h.srv.Detail(id)
+	ctx := c.Request.Context()
+	data, err := h.srv.Detail(ctx, id)
 	if err != nil {
 		response.Fail(c, err.Error())
 		return

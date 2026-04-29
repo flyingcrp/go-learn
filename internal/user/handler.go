@@ -21,7 +21,8 @@ func (u *UserHandler) Register(c *gin.Context) {
 		response.FailWithValid(c, err)
 		return
 	}
-	user, err := u.srv.Register(params)
+
+	user, err := u.srv.Register(c.Request.Context(), params)
 	if err != nil {
 		response.Fail(c, err.Error())
 		return
@@ -43,7 +44,7 @@ func (u *UserHandler) Update(c *gin.Context) {
 		response.FailWithValid(c, err)
 		return
 	}
-	updatedUser, err := u.srv.Update(id, params)
+	updatedUser, err := u.srv.Update(c.Request.Context(), id, params)
 	if err != nil {
 		response.Fail(c, err.Error())
 		return
