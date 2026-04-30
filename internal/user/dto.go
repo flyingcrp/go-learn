@@ -73,3 +73,12 @@ func toUserDetailResp(user *User) *UserDetailResp {
 		UpdatedAt:    utils.FmtDateTime(user.UpdatedAt),
 	}
 }
+
+type UserListReq struct {
+	utils.Pagination
+	Name string `form:"name"`
+}
+type UserListResp struct {
+	List  []UserDetailResp `json:"list"`
+	Total int64            `json:"total"`
+}

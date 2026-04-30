@@ -28,7 +28,7 @@ func TraceGuard() gin.HandlerFunc {
 	}
 }
 
-func MustGetTraceId(ctx context.Context) string {
+func GetTraceId(ctx context.Context) string {
 	if v := ctx.Value(TraceIdKey{}); v == nil {
 		return ""
 	} else {

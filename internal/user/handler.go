@@ -92,3 +92,19 @@ func (u *UserHandler) Login(c *gin.Context) {
 	}
 	response.OkWithData(c, toLoginResp(user, token))
 }
+func (h *UserHandler) List(c *gin.Context) {
+	params, err := validation.BindQuery[UserListReq](c)
+	if err != nil {
+		response.FailWithValid(c, err)
+		return
+	}
+	result, err := h.srv.List(c.Request.Context(), params)
+	if err != nil {
+		response.Fail(c, err.Error())
+		return
+	}
+	response.OkWithData(c, UserListResp{
+		List:  result.List,
+		Total: result.Total,
+	})
+}

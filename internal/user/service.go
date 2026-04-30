@@ -132,3 +132,18 @@ func (s *UserService) GenerateJWT(user *User) (string, error) {
 	}
 	return tokenString, nil
 }
+
+func (s *UserService) List(ctx context.Context, params *UserListReq) (*UserListResp, error) {
+	list, total, e := s.repo.List(ctx, params)
+	if e != nil {
+		return nil, e
+	}
+	items := make([]UserDetailResp, len(list))
+	for i, u := range list {
+		items[i] = *toUserDetailResp(&u)
+	}
+	return &UserListResp{
+		List:  items,
+		Total: total,
+	}, nil
+}

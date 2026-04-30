@@ -7,6 +7,7 @@ import (
 func RegisterRouter(r *gin.RouterGroup, h *UserHandler, authGuard gin.HandlerFunc) {
 	user := r.Group("/user")
 	{
+		user.GET("", authGuard, h.List)
 		user.POST("/register", h.Register)
 		user.POST("/:id/update", authGuard, h.Update)
 		user.GET("/:id", authGuard, h.Detail)

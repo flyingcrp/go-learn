@@ -52,3 +52,24 @@ func (r *UserRepository) Login(ctx context.Context, name, email string) (*User, 
 	}
 	return &user, nil
 }
+func (r *UserRepository) List(ctx context.Context, params *UserListReq) (list []User, total int64, err error) {
+	baseQuery := r.db.WithContext(ctx).Model(&User{})
+	if params.Name != "" {
+		baseQuery = baseQuery.Where("name LIKE ?", "%"+params.Name+"%")
+	}
+	if err = baseQuery.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	if total == 0 {
+		return []User{}, 0, nil
+	}
+	if err = baseQuery.
+		Limit(params.PageSize).
+		Offset((params.Page - 1) * params.PageSize).
+		Omit("Token").
+		Order("created_at desc").
+		Find(&list).Error; err != nil {
+		return nil, 0, err
+	}
+	return list, total, nil
+}
