@@ -1,4 +1,4 @@
-# Go Learn 项目
+# llm-2-golang 项目
 
 这是一个基于Gin框架的Go Web应用项目。
 
@@ -29,24 +29,6 @@ go build -o tmp/main ./cmd/server
 # 运行
 ./tmp/main  # Unix/Linux/macOS
 tmp/main.exe  # Windows
-```
-
-## 项目结构
-
-```Text
-app/
-├── common/
-│   ├── middleware/     # 中间件
-│   ├── response/       # 响应封装
-│   ├── router/         # 路由管理
-│   ├── storage/        # 数据存储
-│   └── validation/     # 参数验证
-├── user/               # 用户模块
-│   ├── handler.go      # 处理器
-│   ├── request.go      # 请求结构体
-│   ├── router.go       # 路由定义
-│   └── service.go      # 业务逻辑
-└── main.go             # 程序入口
 ```
 
 ## 环境要求
