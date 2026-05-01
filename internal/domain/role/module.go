@@ -1,7 +1,7 @@
 package role
 
 import (
-	"go-learn/internal/storage"
+	"go-learn/internal/infra/storage"
 	"time"
 )
 

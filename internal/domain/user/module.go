@@ -1,9 +1,9 @@
 package user
 
 import (
-	"go-learn/internal/department"
-	"go-learn/internal/role"
-	"go-learn/internal/storage"
+	"go-learn/internal/domain/department"
+	"go-learn/internal/domain/role"
+	"go-learn/internal/infra/storage"
 )
 
 func NewUserModule(infra *storage.Infra, depUtils *department.Utils, roleUtils *role.Utils, jwtSecret string) *UserHandler {

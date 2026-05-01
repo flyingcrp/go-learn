@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go-learn/internal/department"
-	"go-learn/internal/role"
+	"go-learn/internal/domain/department"
+	"go-learn/internal/domain/role"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
