@@ -18,6 +18,13 @@
    - [x] 一致性优先于灵活性：同一个 struct 的 receiver 名全文件统一；命名风格遵循 Go 社区惯例
 
 2. Go 类型系统与语义
+   - [x] 值语义 vs 指针语义：Go 一切传值，slice/map 的「引用感」只是 header 拷贝
+   - [x] Struct 嵌入（组合 > 继承）：方法提升、字段提升，不是继承而是语法糖
+   - [x] Slice 内部原理：ptr + len + cap 三元组，append 扩容与底层数组共享的坑
+   - [x] Interface 底层表示：eface vs iface，nil interface ≠ nil concrete type
+   - [x] 零值设计：一切都有零值，利用零值减少 nil 检查
+   - [x] 类型定义 vs 类型别名：type T S vs type T = S
+   - [x] 泛型基础：类型参数、约束（constraints）、~ 近似约束
 3. 标准库
 4. 测试
 5. 并发编程
