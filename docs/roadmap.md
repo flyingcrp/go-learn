@@ -30,11 +30,11 @@
    **基础 — 写 Go 绕不开的**
    - [x] `fmt`：格式化输入输出，Stringer 接口
    - [x] `io` / `bufio`：Reader/Writer 是 I/O 基石；缓冲读写
-   - [ ] `strings` / `bytes`：Builder 避免拼接分配；bytes 是 []byte 版的 strings
-   - [ ] `strconv`：字符串与数值互转
-   - [ ] `os` / `path/filepath`：文件操作、环境变量；跨平台路径
-   - [ ] `time`：Time 值类型、Duration / Ticker / Timer、时区
-   - [ ] `errors`：wrap / unwrap、Is / As、Join（1.20+）
+   - [x] `strings` / `bytes`：Builder 避免拼接分配；bytes 是 []byte 版的 strings
+   - [x] `strconv`：字符串与数值互转
+   - [x] `os` / `path/filepath`：文件操作、环境变量；跨平台路径
+   - [x] `time`：Time 值类型、Duration / Ticker / Timer、时区
+   - [x] `errors`：wrap / unwrap、Is / As、Join（1.20+）
 
    **中级 — 项目实战常用**
    - [ ] `context`：取消传播、超时控制，请求生命周期的脊梁
