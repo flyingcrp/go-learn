@@ -3,10 +3,10 @@ package role
 import "context"
 
 type Utils struct {
-	repo *RoleRepository
+	repo *gormRoleRepo
 }
 
-func NewUtils(repo *RoleRepository) *Utils {
+func NewUtils(repo *gormRoleRepo) *Utils {
 	return &Utils{repo: repo}
 }
 

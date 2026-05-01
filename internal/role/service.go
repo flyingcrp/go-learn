@@ -7,11 +7,18 @@ import (
 	"github.com/google/uuid"
 )
 
-type RoleService struct {
-	repo *RoleRepository
+type RoleRepo interface {
+	ExistsByName(ctx context.Context, name string) (bool, error)
+	ExistsByCode(ctx context.Context, code string) (bool, error)
+	Create(ctx context.Context, role *Role) error
+	FindByID(ctx context.Context, id string) (*Role, error)
 }
 
-func NewRoleService(repo *RoleRepository) *RoleService {
+type RoleService struct {
+	repo RoleRepo
+}
+
+func NewRoleService(repo RoleRepo) *RoleService {
 	return &RoleService{repo: repo}
 }
 

@@ -3,10 +3,10 @@ package department
 import "context"
 
 type Utils struct {
-	repo *DepartmentRepository
+	repo *gormDepartmentRepo
 }
 
-func NewUtils(repo *DepartmentRepository) *Utils {
+func NewUtils(repo *gormDepartmentRepo) *Utils {
 	return &Utils{repo: repo}
 }
 

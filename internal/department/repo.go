@@ -7,15 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type DepartmentRepository struct {
+type gormDepartmentRepo struct {
 	db *gorm.DB
 }
 
-func NewDepartmentRepository(db *gorm.DB) *DepartmentRepository {
-	return &DepartmentRepository{db: db}
+func NewDepartmentRepository(db *gorm.DB) *gormDepartmentRepo {
+	return &gormDepartmentRepo{db: db}
 }
 
-func (repo *DepartmentRepository) FindByID(ctx context.Context, id string) (*Department, error) {
+func (repo *gormDepartmentRepo) FindByID(ctx context.Context, id string) (*Department, error) {
 	var dep Department
 	err := repo.db.WithContext(ctx).Where("id = ?", id).First(&dep).Error
 	if err != nil {
@@ -26,7 +26,7 @@ func (repo *DepartmentRepository) FindByID(ctx context.Context, id string) (*Dep
 	}
 	return &dep, nil
 }
-func (repo *DepartmentRepository) ExistsByName(ctx context.Context, name string) (bool, error) {
+func (repo *gormDepartmentRepo) ExistsByName(ctx context.Context, name string) (bool, error) {
 	var cnt int64
 	err := repo.db.WithContext(ctx).Model(&Department{}).Where("name = ?", name).Count(&cnt).Error
 	if err != nil {
@@ -34,6 +34,6 @@ func (repo *DepartmentRepository) ExistsByName(ctx context.Context, name string)
 	}
 	return cnt > 0, nil
 }
-func (repo *DepartmentRepository) Create(ctx context.Context, department *Department) error {
+func (repo *gormDepartmentRepo) Create(ctx context.Context, department *Department) error {
 	return repo.db.WithContext(ctx).Create(department).Error
 }

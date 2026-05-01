@@ -7,15 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type gormUserRepo struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewUserRepository(db *gorm.DB) *gormUserRepo {
+	return &gormUserRepo{db: db}
 }
 
-func (r *UserRepository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
+func (r *gormUserRepo) ExistsByEmail(ctx context.Context, email string) (bool, error) {
 	var cnt int64
 	err := r.db.WithContext(ctx).Model(&User{}).Where("email = ?", email).Count(&cnt).Error
 	if err != nil {
@@ -23,13 +23,13 @@ func (r *UserRepository) ExistsByEmail(ctx context.Context, email string) (bool,
 	}
 	return cnt > 0, nil
 }
-func (r *UserRepository) Create(ctx context.Context, user *User) error {
+func (r *gormUserRepo) Create(ctx context.Context, user *User) error {
 	return r.db.WithContext(ctx).Create(user).Error
 }
-func (r *UserRepository) Update(ctx context.Context, id string, newUser *User) error {
+func (r *gormUserRepo) Update(ctx context.Context, id string, newUser *User) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Updates(newUser).Error
 }
-func (r *UserRepository) FindByID(ctx context.Context, id string) (*User, error) {
+func (r *gormUserRepo) FindByID(ctx context.Context, id string) (*User, error) {
 	var user User
 	err := r.db.WithContext(ctx).Where("id = ?", id).Omit("Token").Take(&user).Error
 	if err != nil {
@@ -41,7 +41,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*User, error)
 	return &user, nil
 }
 
-func (r *UserRepository) Login(ctx context.Context, name, email string) (*User, error) {
+func (r *gormUserRepo) Login(ctx context.Context, name, email string) (*User, error) {
 	var user User
 	err := r.db.WithContext(ctx).Where("name = ? AND email = ?", name, email).Take(&user).Error
 	if err != nil {
@@ -52,7 +52,7 @@ func (r *UserRepository) Login(ctx context.Context, name, email string) (*User, 
 	}
 	return &user, nil
 }
-func (r *UserRepository) List(ctx context.Context, params *UserListReq) (list []User, total int64, err error) {
+func (r *gormUserRepo) List(ctx context.Context, params *UserListReq) (list []User, total int64, err error) {
 	baseQuery := r.db.WithContext(ctx).Model(&User{})
 	if params.Name != "" {
 		baseQuery = baseQuery.Where("name LIKE ?", "%"+params.Name+"%")

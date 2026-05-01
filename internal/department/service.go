@@ -7,11 +7,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type DepartmentRepo interface {
+	FindByID(ctx context.Context, id string) (*Department, error)
+	Create(ctx context.Context, department *Department) error
+	ExistsByName(ctx context.Context, name string) (bool, error)
+}
 type DepartmentService struct {
-	repo *DepartmentRepository
+	repo DepartmentRepo
 }
 
-func NewDepartmentService(repo *DepartmentRepository) *DepartmentService {
+func NewDepartmentService(repo DepartmentRepo) *DepartmentService {
 	return &DepartmentService{repo: repo}
 }
 

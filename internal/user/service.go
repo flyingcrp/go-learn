@@ -11,14 +11,31 @@ import (
 	"github.com/google/uuid"
 )
 
+type UserRepo interface {
+	Create(ctx context.Context, user *User) error
+	Update(ctx context.Context, id string, user *User) error
+	FindByID(ctx context.Context, id string) (*User, error)
+	Login(ctx context.Context, name, email string) (*User, error)
+	List(ctx context.Context, params *UserListReq) ([]User, int64, error)
+	ExistsByEmail(ctx context.Context, email string) (bool, error)
+}
+
+type DepartmentChecker interface {
+	CheckID(ctx context.Context, id string) (*department.Department, error)
+}
+
+type RoleChecker interface {
+	CheckID(ctx context.Context, id string) (*role.Role, error)
+}
+
 type UserService struct {
-	repo      *UserRepository
-	depUtils  *department.Utils
-	roleUtils *role.Utils
+	repo      UserRepo
+	depUtils  DepartmentChecker
+	roleUtils RoleChecker
 	jwtSecret string
 }
 
-func NewUserService(repo *UserRepository, depUtils *department.Utils, roleUtils *role.Utils, jwtSecret string) *UserService {
+func NewUserService(repo UserRepo, depUtils DepartmentChecker, roleUtils RoleChecker, jwtSecret string) *UserService {
 	return &UserService{repo: repo, depUtils: depUtils, roleUtils: roleUtils, jwtSecret: jwtSecret}
 }
 func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, error) {
