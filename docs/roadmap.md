@@ -26,6 +26,29 @@
    - [x] 类型定义 vs 类型别名：type T S vs type T = S
    - [x] 泛型基础：类型参数、约束（constraints）、~ 近似约束
 3. 标准库
+
+   **基础 — 写 Go 绕不开的**
+   - [x] `fmt`：格式化输入输出，Stringer 接口
+   - [x] `io` / `bufio`：Reader/Writer 是 I/O 基石；缓冲读写
+   - [ ] `strings` / `bytes`：Builder 避免拼接分配；bytes 是 []byte 版的 strings
+   - [ ] `strconv`：字符串与数值互转
+   - [ ] `os` / `path/filepath`：文件操作、环境变量；跨平台路径
+   - [ ] `time`：Time 值类型、Duration / Ticker / Timer、时区
+   - [ ] `errors`：wrap / unwrap、Is / As、Join（1.20+）
+
+   **中级 — 项目实战常用**
+   - [ ] `context`：取消传播、超时控制，请求生命周期的脊梁
+   - [ ] `encoding/json`：struct tag、自定义 Marshal/Unmarshal、RawMessage
+   - [ ] `sync`：Mutex / RWMutex、WaitGroup、Once、Pool
+   - [ ] `flag`：CLI 参数解析
+   - [ ] `net/http` / `net/url`：Server / Handler / 中间件模式；Client 连接复用
+   - [ ] `log/slog`：结构化日志（1.21+，替代 log 包）
+
+   **高级 — 性能 & 细节**
+   - [ ] `sync/atomic`：Go 1.19+ 推荐 atomic.Int64 类型
+   - [ ] `slices` / `sort`：泛型切片操作（1.21+，逐步替代 sort）
+   - [ ] `net`：TCP / UDP 底层（后续并发编程会深入）
+   - [ ] `regexp`：线性时间保证，不支持回溯/前瞻
 4. 测试
 5. 并发编程
 6. 网络与流式通信
