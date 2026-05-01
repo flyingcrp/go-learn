@@ -14,8 +14,8 @@
    - [x] 声明错误而非抛出：错误是值，通过返回值流动。找不到记录用 sentinel error（如 ErrNotFound），不用 (nil, nil) 或 panic
    - [x] Go 的 REST：按语义使用 HTTP 状态码，不要让错误响应返回 HTTP 200
    - [x] 包按职责拆分，不按类型拆分：消除 common / utils / base 这类万能包；包名简短且表达明确功能
-   - [ ] 少即是多：不写省一个参数的 convenience wrapper；一个 struct 能满足的场景不抽象 interface
-   - [ ] 一致性优先于灵活性：同一个 struct 的 receiver 名全文件统一；命名风格遵循 Go 社区惯例
+   - [x] 少即是多：不写省一个参数的 convenience wrapper；一个 struct 能满足的场景不抽象 interface
+   - [x] 一致性优先于灵活性：同一个 struct 的 receiver 名全文件统一；命名风格遵循 Go 社区惯例
 
 2. Go 类型系统与语义
 3. 标准库

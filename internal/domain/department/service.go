@@ -50,3 +50,6 @@ func (srv *DepartmentService) Detail(ctx context.Context, id string) (*Departmen
 	}
 	return data, nil
 }
+func (srv *DepartmentService) CheckID(ctx context.Context, id string) (*Department, error) {
+	return srv.repo.FindByID(ctx, id)
+}

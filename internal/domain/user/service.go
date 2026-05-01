@@ -23,20 +23,19 @@ type UserRepo interface {
 type DepartmentChecker interface {
 	CheckID(ctx context.Context, id string) (*department.Department, error)
 }
-
 type RoleChecker interface {
 	CheckID(ctx context.Context, id string) (*role.Role, error)
 }
 
 type UserService struct {
-	repo      UserRepo
-	depUtils  DepartmentChecker
-	roleUtils RoleChecker
-	jwtSecret string
+	repo        UserRepo
+	depChecker  DepartmentChecker
+	roleChecker RoleChecker
+	jwtSecret   string
 }
 
 func NewUserService(repo UserRepo, depUtils DepartmentChecker, roleUtils RoleChecker, jwtSecret string) *UserService {
-	return &UserService{repo: repo, depUtils: depUtils, roleUtils: roleUtils, jwtSecret: jwtSecret}
+	return &UserService{repo: repo, depChecker: depUtils, roleChecker: roleUtils, jwtSecret: jwtSecret}
 }
 func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, error) {
 	exist, err := s.repo.ExistsByEmail(ctx, p.Email)
@@ -53,12 +52,12 @@ func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, 
 
 	go func() {
 		var err error
-		dep, err = s.depUtils.CheckID(ctx, p.DepartmentID)
+		dep, err = s.depChecker.CheckID(ctx, p.DepartmentID)
 		done <- err
 	}()
 	go func() {
 		var err error
-		roleResult, err = s.roleUtils.CheckID(ctx, p.RoleID)
+		roleResult, err = s.roleChecker.CheckID(ctx, p.RoleID)
 		done <- err
 	}()
 

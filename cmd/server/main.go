@@ -53,7 +53,7 @@ func main() {
 		role.RegisterRouter(v1, roleModule.Handler, authGuard)
 
 		// 注入用户模块
-		userHandler := user.NewUserModule(infra, dep.Utils, roleModule.Utils, cfg.JWTSecret)
+		userHandler := user.NewUserModule(infra, dep.Srv, roleModule.Srv, cfg.JWTSecret)
 		user.RegisterRouter(v1, userHandler, authGuard)
 	}
 

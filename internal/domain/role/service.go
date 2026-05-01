@@ -59,3 +59,6 @@ func (srv *RoleService) Create(ctx context.Context, params *RoleCreateRequest) (
 func (srv *RoleService) Detail(ctx context.Context, id string) (*Role, error) {
 	return srv.repo.FindByID(ctx, id)
 }
+func (srv *RoleService) CheckID(ctx context.Context, id string) (*Role, error) {
+	return srv.repo.FindByID(ctx, id)
+}
