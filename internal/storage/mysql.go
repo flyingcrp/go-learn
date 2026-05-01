@@ -16,7 +16,7 @@ func NewMySQL(cfg mysql.Config) (*gorm.DB, error) {
 	}
 	dbIns, err := gorm.Open(gm.Open(cfg.FormatDSN()), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("GORM初始化失败: %v", err)
+		return nil, fmt.Errorf("GORM初始化失败: %w", err)
 	}
 	sqlDB, err := dbIns.DB()
 	if err != nil {

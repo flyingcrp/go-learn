@@ -9,13 +9,13 @@
 ## 核心主题学习顺序
 
 1. Go 惯用法与思维转变
-   - 接受 interface 返回 struct：接口由消费方（调用方）定义，不是由实现方导出。实现方只需返回具体 struct
-   - 显式 > 隐式：类型断言必须有 comma-ok；error 必须显式处理、逐层传递；不依赖 init() 的执行顺序
-   - 声明错误而非抛出：错误是值，通过返回值流动。找不到记录用 sentinel error（如 ErrNotFound），不用 (nil, nil) 或 panic
-   - Go 的 REST：按语义使用 HTTP 状态码，不要让错误响应返回 HTTP 200
-   - 包按职责拆分，不按类型拆分：消除 common / utils / base 这类万能包；包名简短且表达明确功能
-   - 少即是多：不写省一个参数的 convenience wrapper；一个 struct 能满足的场景不抽象 interface
-   - 一致性优先于灵活性：同一个 struct 的 receiver 名全文件统一；命名风格遵循 Go 社区惯例
+   - [x] 接受 interface 返回 struct：接口由消费方（调用方）定义，不是由实现方导出。实现方只需返回具体 struct
+   - [x] 显式 > 隐式：类型断言必须有 comma-ok；error 必须显式处理、逐层传递；不依赖 init() 的执行顺序
+   - [ ] 声明错误而非抛出：错误是值，通过返回值流动。找不到记录用 sentinel error（如 ErrNotFound），不用 (nil, nil) 或 panic
+   - [ ] Go 的 REST：按语义使用 HTTP 状态码，不要让错误响应返回 HTTP 200
+   - [ ] 包按职责拆分，不按类型拆分：消除 common / utils / base 这类万能包；包名简短且表达明确功能
+   - [ ] 少即是多：不写省一个参数的 convenience wrapper；一个 struct 能满足的场景不抽象 interface
+   - [ ] 一致性优先于灵活性：同一个 struct 的 receiver 名全文件统一；命名风格遵循 Go 社区惯例
 
 2. Go 类型系统与语义
 3. 标准库
