@@ -1,6 +1,6 @@
 package department
 
-import "go-learn/internal/common/storage"
+import "go-learn/internal/storage"
 
 type DepartmentModule struct {
 	Handler *DepartmentHandler

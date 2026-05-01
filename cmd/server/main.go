@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
-	"go-learn/internal/common/middleware"
-	"go-learn/internal/common/storage"
 	"go-learn/internal/common/validation"
 	"go-learn/internal/config"
 	"go-learn/internal/department"
+	"go-learn/internal/middleware"
 	"go-learn/internal/role"
+	"go-learn/internal/storage"
 	"go-learn/internal/user"
 	"log"
 	"net/http"
