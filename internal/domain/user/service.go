@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"go-learn/internal/domain/department"
 	"go-learn/internal/domain/role"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"golang.org/x/sync/errgroup"
 )
 
 type UserRepo interface {
@@ -45,26 +47,31 @@ func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, 
 	if exist {
 		return nil, fmt.Errorf("邮箱已注册")
 	}
-
-	done := make(chan error, 2) // 缓冲 2，保证两个 goroutine 都能写入不阻塞
+	g, egCtx := errgroup.WithContext(ctx)
+	egCtx, cancel := context.WithTimeout(egCtx, 3*time.Second)
+	defer cancel()
 	var dep *department.Department
 	var roleResult *role.Role
 
-	go func() {
-		var err error
-		dep, err = s.depChecker.CheckID(ctx, p.DepartmentID)
-		done <- err
-	}()
-	go func() {
-		var err error
-		roleResult, err = s.roleChecker.CheckID(ctx, p.RoleID)
-		done <- err
-	}()
-
-	for range 2 {
-		if err := <-done; err != nil {
-			return nil, fmt.Errorf("校验失败: %w", err)
+	g.Go(func() error {
+		d, err := s.depChecker.CheckID(egCtx, p.DepartmentID)
+		if err != nil {
+			return err
 		}
+		dep = d
+		return nil
+	})
+	g.Go(func() error {
+		r, err := s.roleChecker.CheckID(egCtx, p.RoleID)
+		if err != nil {
+			return err
+		}
+		roleResult = r
+		return nil
+	})
+
+	if err := g.Wait(); err != nil {
+		return nil, fmt.Errorf("校验失败: %w", err)
 	}
 
 	if dep == nil || roleResult == nil {

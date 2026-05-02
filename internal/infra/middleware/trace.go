@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type TraceIdKey struct{}
+type traceIdKey struct{}
 
 func TraceGuard() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -20,8 +20,8 @@ func TraceGuard() gin.HandlerFunc {
 			}
 			traceId = uid.String()
 		}
-		c.Set(TraceIdKey{}, traceId)
-		newCtx := context.WithValue(c.Request.Context(), TraceIdKey{}, traceId)
+		c.Set(traceIdKey{}, traceId)
+		newCtx := context.WithValue(c.Request.Context(), traceIdKey{}, traceId)
 		c.Request = c.Request.WithContext(newCtx)
 		c.Writer.Header().Set("X-Trace-Id", traceId)
 		c.Next()
@@ -29,7 +29,7 @@ func TraceGuard() gin.HandlerFunc {
 }
 
 func GetTraceId(ctx context.Context) string {
-	if v := ctx.Value(TraceIdKey{}); v == nil {
+	if v := ctx.Value(traceIdKey{}); v == nil {
 		return ""
 	} else {
 		return v.(string)
