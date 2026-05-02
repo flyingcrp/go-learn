@@ -7,8 +7,10 @@ import (
 	"go-learn/internal/domain/department"
 	"go-learn/internal/domain/role"
 	"go-learn/internal/domain/user"
+	"go-learn/internal/infra/logger"
 	"go-learn/internal/infra/middleware"
 	"go-learn/internal/infra/storage"
+	"log/slog"
 
 	"log"
 	"net/http"
@@ -16,7 +18,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,13 +27,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
+	logger.Init(slog.LevelDebug)
 	infra, cleanup, err := storage.NewInfra(storage.Config{
 		MySQL: cfg.MySQL,
 	})
 	if err != nil {
-		log.Fatalf("Failed to initialize infrastructure: %v", err)
+		log.Fatalf("Failed to initialize infrastructure,error:%v", err)
 	}
 	defer cleanup()
+
 	routers := gin.New()
 	routers.Use(gin.CustomRecovery(func(c *gin.Context, err any) {
 		c.AbortWithStatusJSON(500, gin.H{
@@ -58,8 +61,11 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:    cfg.Port,
-		Handler: routers,
+		Addr:         cfg.Port,
+		Handler:      routers,
+		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -67,7 +73,7 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Listen Error: %s\n", err)
+			slog.Error("Listen Error: ", "error", err)
 		}
 	}()
 	<-ctx.Done()
@@ -80,7 +86,7 @@ func main() {
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		color.Red("服务强制关闭: ", err)
+		slog.Error("服务关闭失败: ", "error", err)
 	}
-	color.Yellow("服务已退出了")
+	slog.Info("服务已退出")
 }

@@ -41,8 +41,8 @@
    - [x] `encoding/json`：struct tag、自定义 Marshal/Unmarshal、RawMessage
    - [x] `sync`：Mutex / RWMutex、WaitGroup、Once、Pool
    - [x] `flag`：CLI 参数解析
-   - [ ] `net/http` / `net/url`：Server / Handler / 中间件模式；Client 连接复用
-   - [ ] `log/slog`：结构化日志（1.21+，替代 log 包）
+   - [x] `net/http` / `net/url`：Server / Handler / 中间件模式；Client 连接复用
+   - [x] `log/slog`：结构化日志（1.21+，替代 log 包）
 
    **高级 — 性能 & 细节**
    - [ ] `sync/atomic`：Go 1.19+ 推荐 atomic.Int64 类型

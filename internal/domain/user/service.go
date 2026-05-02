@@ -22,21 +22,21 @@ type UserRepo interface {
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
 }
 
-type DepartmentChecker interface {
+type departmentChecker interface {
 	CheckID(ctx context.Context, id string) (*department.Department, error)
 }
-type RoleChecker interface {
+type roleChecker interface {
 	CheckID(ctx context.Context, id string) (*role.Role, error)
 }
 
 type UserService struct {
 	repo        UserRepo
-	depChecker  DepartmentChecker
-	roleChecker RoleChecker
+	depChecker  departmentChecker
+	roleChecker roleChecker
 	jwtSecret   string
 }
 
-func NewUserService(repo UserRepo, depUtils DepartmentChecker, roleUtils RoleChecker, jwtSecret string) *UserService {
+func NewUserService(repo UserRepo, depUtils departmentChecker, roleUtils roleChecker, jwtSecret string) *UserService {
 	return &UserService{repo: repo, depChecker: depUtils, roleChecker: roleUtils, jwtSecret: jwtSecret}
 }
 func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, error) {

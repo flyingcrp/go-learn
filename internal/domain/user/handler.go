@@ -3,6 +3,7 @@ package user
 import (
 	"go-learn/internal/common/response"
 	"go-learn/internal/common/validation"
+	"log/slog"
 
 	"github.com/gin-gonic/gin"
 )
@@ -93,6 +94,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	response.OkWithData(c, toLoginResp(user, token))
 }
 func (h *UserHandler) List(c *gin.Context) {
+	slog.WarnContext(c.Request.Context(), "测试")
 	params, err := validation.BindQuery[UserListReq](c)
 	if err != nil {
 		response.FailWithValid(c, err)
