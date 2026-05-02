@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -13,31 +14,37 @@ import (
 	zhTranslations "github.com/go-playground/validator/v10/translations/zh"
 )
 
-var Trans ut.Translator
+var (
+	Trans ut.Translator
+	once  sync.Once
+)
 
 func InitTrans() {
-	// 注册中文翻译器
-	zhT := zh.New()
-	uni := ut.New(zhT, zhT)
-	Trans, _ = uni.GetTranslator("zh")
+	once.Do(func() {
+		// 注册中文翻译器
+		zhT := zh.New()
+		uni := ut.New(zhT, zhT)
+		Trans, _ = uni.GetTranslator("zh")
 
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 
-		// --- 新增核心代码：注册自定义标签获取函数 ---
-		v.RegisterTagNameFunc(func(fld reflect.StructField) string {
-			// 获取 json 标签的值
-			name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
-			if name == "" {
-				name = fld.Tag.Get("form")
-			}
-			// 如果 json 标签是 "-" (忽略字段)，则返回原字段名
-			if name == "-" {
-				return ""
-			}
-			return name
-		})
-		_ = zhTranslations.RegisterDefaultTranslations(v, Trans)
-	}
+			// --- 新增核心代码：注册自定义标签获取函数 ---
+			v.RegisterTagNameFunc(func(fld reflect.StructField) string {
+				// 获取 json 标签的值
+				name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
+				if name == "" {
+					name = fld.Tag.Get("form")
+				}
+				// 如果 json 标签是 "-" (忽略字段)，则返回原字段名
+				if name == "-" {
+					return ""
+				}
+				return name
+			})
+			_ = zhTranslations.RegisterDefaultTranslations(v, Trans)
+		}
+	})
+
 }
 
 // Translate 提取并翻译错误信息
