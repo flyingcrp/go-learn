@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"go-learn/internal/infra/logger"
+	"log/slog"
 	"os"
 	"time"
 
@@ -13,6 +15,8 @@ type Config struct {
 	ShutdownTimeout time.Duration
 	MySQL           mysql.Config
 	JWTSecret       string
+	LogLevel        slog.Level
+	LogFormat       logger.Format
 }
 
 func Load() (*Config, error) {
@@ -23,10 +27,30 @@ func Load() (*Config, error) {
 	if mysqlAddr == "" || mysqlUser == "" || mysqlPwd == "" || os.Getenv("DB_NAME") == "" {
 		return nil, fmt.Errorf("mysql 配置异常")
 	}
+	var logLevel slog.Level
+	switch os.Getenv("LOG_LEVEL") {
+	case "debug":
+		logLevel = slog.LevelDebug
+	case "warn":
+		logLevel = slog.LevelWarn
+	case "error":
+		logLevel = slog.LevelError
+	default:
+		logLevel = slog.LevelInfo
+	}
+	var logFormat logger.Format
+	switch os.Getenv("LOG_FORMAT") {
+	case "text":
+		logFormat = logger.Text
+	default:
+		logFormat = logger.JSON
+	}
 	return &Config{
 		Port:            ":9000",
 		ShutdownTimeout: d,
 		JWTSecret:       os.Getenv("JWT_SECRET"),
+		LogLevel:        logLevel,
+		LogFormat:       logFormat,
 		MySQL: mysql.Config{
 			User:                 mysqlUser,
 			Passwd:               mysqlPwd,

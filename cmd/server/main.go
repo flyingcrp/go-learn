@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
-	logger.Init(slog.LevelDebug)
+	logger.Init(cfg.LogLevel, cfg.LogFormat)
 	infra, cleanup, err := storage.NewInfra(storage.Config{
 		MySQL: cfg.MySQL,
 	})
