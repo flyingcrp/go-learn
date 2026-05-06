@@ -7,6 +7,7 @@ import (
 	"go-learn/internal/domain/department"
 	"go-learn/internal/domain/role"
 	"go-learn/internal/domain/user"
+	"go-learn/internal/infra/event"
 	"go-learn/internal/infra/logger"
 	"go-learn/internal/infra/middleware"
 	"go-learn/internal/infra/storage"
@@ -44,6 +45,8 @@ func main() {
 			"data":    nil,
 		})
 	}))
+	bus := event.NewBus()
+
 	v1 := routers.Group("/v1", middleware.TraceGuard())
 	{
 
@@ -56,7 +59,7 @@ func main() {
 		role.RegisterRouter(v1, roleModule.Handler, authGuard)
 
 		// 注入用户模块
-		userHandler := user.NewUserModule(infra, dep.Srv, roleModule.Srv, cfg.JWTSecret)
+		userHandler := user.NewUserModule(infra, dep.Srv, roleModule.Srv, bus, cfg.JWTSecret)
 		user.RegisterRouter(v1, userHandler, authGuard)
 	}
 
@@ -76,6 +79,26 @@ func main() {
 			slog.Error("Listen Error: ", "error", err)
 		}
 	}()
+
+	// 事件消费者：阻塞等待事件，ctx 取消时退出
+	sub := bus.Subscribe(ctx, 100)
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				slog.Error("event consumer panic", "recover", r)
+			}
+		}()
+		for {
+			select {
+			case e := <-sub:
+				slog.Info("收到事件", "type", e.Type)
+			case <-ctx.Done():
+				slog.Info("事件消费者退出")
+				return
+			}
+		}
+	}()
+
 	<-ctx.Done()
 	// 优雅关闭：开发环境可设置 SHUTDOWN_TIMEOUT=1s 加快重启
 	timeout := 600 * time.Millisecond

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go-learn/internal/domain/department"
 	"go-learn/internal/domain/role"
+	"go-learn/internal/infra/event"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -33,11 +34,12 @@ type UserService struct {
 	repo        UserRepo
 	depChecker  departmentChecker
 	roleChecker roleChecker
+	bus         *event.Bus
 	jwtSecret   string
 }
 
-func NewUserService(repo UserRepo, depUtils departmentChecker, roleUtils roleChecker, jwtSecret string) *UserService {
-	return &UserService{repo: repo, depChecker: depUtils, roleChecker: roleUtils, jwtSecret: jwtSecret}
+func NewUserService(repo UserRepo, depUtils departmentChecker, roleUtils roleChecker, bus *event.Bus, jwtSecret string) *UserService {
+	return &UserService{repo: repo, depChecker: depUtils, roleChecker: roleUtils, bus: bus, jwtSecret: jwtSecret}
 }
 func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, error) {
 	exist, err := s.repo.ExistsByEmail(ctx, p.Email)
@@ -92,6 +94,10 @@ func (s *UserService) Register(ctx context.Context, p *UserRegisterReq) (*User, 
 	if err != nil {
 		return nil, err
 	}
+	s.bus.Publish(ctx, event.Event{
+		Type:    "user.registered",
+		Payload: user,
+	})
 	return user, nil
 }
 

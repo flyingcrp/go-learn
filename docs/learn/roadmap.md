@@ -11,7 +11,7 @@
 ## 阶段 2：并发编程 — 从串行到并行
 
 - [x] 4. [goroutine 生命周期：启动、退出、泄漏检测](points/04-goroutine-lifecycle.md)
-- [ ] 5. [channel 与 select：生产者-消费者模式](points/05-channel-select.md)
+- [x] 5. [channel 与 select：生产者-消费者模式](points/05-channel-select.md)
 - [ ] 6. [并发安全：data race 与 sync 原语](points/06-concurrency-safety.md)
 
 ## 阶段 3：性能工程 — 从够快到更快
