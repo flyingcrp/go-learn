@@ -55,7 +55,6 @@ func TestLocalCache_Expire(t *testing.T) {
 }
 
 func TestLocalCache_Concurrent(t *testing.T) {
-	// TODO: 用 100 个 goroutine 同时读写，go test -race 验证
 	c := NewLocalCache[int, int](time.Minute)
 	defer c.Close()
 
@@ -63,22 +62,25 @@ func TestLocalCache_Concurrent(t *testing.T) {
 	const numGoroutines = 100
 	const numOps = 1000
 
+	// 使用少量共享 key，让 goroutine 之间产生真正的竞争
+	sharedKeys := []int{1, 2, 3}
+
 	for i := 0; i < numGoroutines; i++ {
 		wg.Add(1)
-		go func(id int) {
+		go func() {
 			defer wg.Done()
-			// TODO: 交替执行 Set/Get/Delete，模拟真实并发场景
 			for j := 0; j < numOps; j++ {
+				key := sharedKeys[j%len(sharedKeys)]
 				switch j % 3 {
 				case 0:
-					c.Set(id, j, time.Minute)
+					c.Set(key, j, time.Minute)
 				case 1:
-					c.Get(id)
+					c.Get(key)
 				default:
-					c.Delete(id)
+					c.Delete(key)
 				}
 			}
-		}(i)
+		}()
 	}
 
 	wg.Wait()

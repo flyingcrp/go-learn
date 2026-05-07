@@ -32,7 +32,6 @@ func NewLocalCache[K comparable, V any](cleanupInterval time.Duration) *LocalCac
 
 // Get 返回 key 对应的值。如果 key 不存在或已过期，返回零值和 false。
 func (c *LocalCache[K, V]) Get(key K) (V, bool) {
-	// TODO: 使用读锁，检查 key 存在且未过期
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	entry, ok := c.items[key]
@@ -45,7 +44,6 @@ func (c *LocalCache[K, V]) Get(key K) (V, bool) {
 
 // Set 存储 key-value，ttl 后过期。
 func (c *LocalCache[K, V]) Set(key K, value V, ttl time.Duration) {
-	// TODO: 使用写锁，存储 entry{value, expiresAt}
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.items[key] = entry[V]{
@@ -56,7 +54,6 @@ func (c *LocalCache[K, V]) Set(key K, value V, ttl time.Duration) {
 
 // Delete 删除指定 key。
 func (c *LocalCache[K, V]) Delete(key K) {
-	// TODO: 使用写锁，delete(c.items, key)
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	delete(c.items, key)
@@ -74,14 +71,17 @@ func (c *LocalCache[K, V]) cleanup(interval time.Duration) {
 	for {
 		select {
 		case <-ticker.C:
-			c.mu.Lock()
-			defer c.mu.Unlock()
+			var expired []K
+			c.mu.RLock()
 			for key, item := range c.items {
 				if item.expiresAt.Before(time.Now()) {
-					delete(c.items, key)
+					expired = append(expired, key)
 				}
 			}
-			// TODO: 使用写锁，遍历并删除过期项
+			c.mu.RUnlock()
+			for _, key := range expired {
+				c.Delete(key)
+			}
 		case <-c.done:
 			return
 		}

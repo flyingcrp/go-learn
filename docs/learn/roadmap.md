@@ -1,6 +1,6 @@
 # Go 学习路线
 >
-> 更新时间：2026-05-06
+> 更新时间：2026-05-07
 
 ## 阶段 1：惯用 Go — 从能跑到写对
 
@@ -12,7 +12,7 @@
 
 - [x] 4. [goroutine 生命周期：启动、退出、泄漏检测](points/04-goroutine-lifecycle.md)
 - [x] 5. [channel 与 select：生产者-消费者模式](points/05-channel-select.md)
-- [ ] 6. [并发安全：data race 与 sync 原语](points/06-concurrency-safety.md)
+- [x] 6. [并发安全：data race 与 sync 原语](points/06-concurrency-safety.md)
 
 ## 阶段 3：性能工程 — 从够快到更快
 
