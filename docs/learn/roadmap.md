@@ -1,6 +1,6 @@
 # Go 学习路线
 >
-> 更新时间：2026-05-07
+> 更新时间：2026-05-08
 
 ## 阶段 1：惯用 Go — 从能跑到写对
 
@@ -16,7 +16,7 @@
 
 ## 阶段 3：性能工程 — 从够快到更快
 
-- [ ] 7. [benchmark 与 pprof 入门](points/07-benchmark-pprof.md)
+- [x] 7. [benchmark 与 pprof 入门](points/07-benchmark-pprof.md)
 - [ ] 8. [内存分配优化与逃逸分析](points/08-allocation-escape.md)
 - [ ] 9. [数据库查询优化：N+1 与批量操作](points/09-db-optimization.md)
 

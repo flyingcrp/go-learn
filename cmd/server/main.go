@@ -19,6 +19,8 @@ import (
 	"syscall"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -79,7 +81,10 @@ func main() {
 			slog.Error("Listen Error: ", "error", err)
 		}
 	}()
-
+	go func() {
+		slog.Info("pprof server started")
+		http.ListenAndServe("localhost:6060", nil)
+	}()
 	// 事件消费者：阻塞等待事件，ctx 取消时退出
 	sub := bus.Subscribe(ctx, 100)
 	go func() {
